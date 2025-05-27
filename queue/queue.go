@@ -1,4 +1,4 @@
-package lockfree
+package queue
 
 import "sync/atomic"
 
@@ -12,7 +12,7 @@ type Queue[T any] struct {
 	h, t  atomic.Pointer[queueNode[T]]
 }
 
-func NewQueue[T any]() *Queue[T] {
+func New[T any]() *Queue[T] {
 	dummy := &queueNode[T]{}
 	head := atomic.Pointer[queueNode[T]]{}
 	tail := atomic.Pointer[queueNode[T]]{}
