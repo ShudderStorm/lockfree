@@ -8,24 +8,24 @@ type queueNode[T any] struct {
 }
 
 type Queue[T any] struct {
-	dummy *queueNode[T]
-	h, t  atomic.Pointer[queueNode[T]]
+	mock *queueNode[T]
+	h, t atomic.Pointer[queueNode[T]]
 }
 
 func New[T any]() *Queue[T] {
-	dummy := &queueNode[T]{}
+	mock := &queueNode[T]{}
 	head := atomic.Pointer[queueNode[T]]{}
 	tail := atomic.Pointer[queueNode[T]]{}
 
-	head.Store(dummy)
-	tail.Store(dummy)
+	head.Store(mock)
+	tail.Store(mock)
 
 	return &Queue[T]{
-		dummy: dummy, h: head, t: tail,
+		mock: mock, h: head, t: tail,
 	}
 }
 
-func (q *Queue[T]) Enq(value T) bool {
+func (q *Queue[T]) Enqueue(value T) bool {
 	node := &queueNode[T]{value: value}
 	for {
 		tail := q.t.Load()
@@ -37,7 +37,7 @@ func (q *Queue[T]) Enq(value T) bool {
 	}
 }
 
-func (q *Queue[T]) Deq() (val T, ok bool) {
+func (q *Queue[T]) Dequeue() (val T, ok bool) {
 	for {
 		head, tail := q.h.Load(), q.t.Load()
 		next := head.next.Load()
