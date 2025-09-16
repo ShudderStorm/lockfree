@@ -2,20 +2,20 @@ package queue
 
 import "sync/atomic"
 
-type queueNode[T any] struct {
+type node[T any] struct {
 	value T
-	next  atomic.Pointer[queueNode[T]]
+	next  atomic.Pointer[node[T]]
 }
 
 type Queue[T any] struct {
-	mock *queueNode[T]
-	h, t atomic.Pointer[queueNode[T]]
+	mock *node[T]
+	h, t atomic.Pointer[node[T]]
 }
 
 func New[T any]() *Queue[T] {
-	mock := &queueNode[T]{}
-	head := atomic.Pointer[queueNode[T]]{}
-	tail := atomic.Pointer[queueNode[T]]{}
+	mock := &node[T]{}
+	head := atomic.Pointer[node[T]]{}
+	tail := atomic.Pointer[node[T]]{}
 
 	head.Store(mock)
 	tail.Store(mock)
@@ -26,11 +26,11 @@ func New[T any]() *Queue[T] {
 }
 
 func (q *Queue[T]) Enqueue(value T) bool {
-	node := &queueNode[T]{value: value}
+	enq := &node[T]{value: value}
 	for {
 		tail := q.t.Load()
-		if tail.next.CompareAndSwap(nil, node) {
-			q.t.CompareAndSwap(tail, node)
+		if tail.next.CompareAndSwap(nil, enq) {
+			q.t.CompareAndSwap(tail, enq)
 			return true
 		}
 		q.t.CompareAndSwap(tail, tail.next.Load())
