@@ -83,11 +83,10 @@ func TestMultiDequeue(t *testing.T) {
 
 	seen := make(map[int]bool, N)
 	for val := range results {
-		if _, ok := seen[val]; !ok {
-			seen[val] = true
-		} else {
+		if seen[val] {
 			t.Fatalf("value %d was dequeued twice", val)
 		}
+		seen[val] = true
 	}
 
 	assert.Equal(
